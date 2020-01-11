@@ -1,6 +1,5 @@
 package com.bslota.refactoring.library;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
@@ -27,7 +26,7 @@ public class BookService {
         if (thereIsA(book) && thereIsA(patron)) {
             if (maximumNumberOfHoldsNotReachedBy(patron)) {
                 if (isAvailable(book)) {
-                    placeOnHold(bookId, patronId, days, book, patron);
+                    placeOnHold(days, book, patron);
                     bookDAO.update(book);
                     patronDAO.update(patron);
                     flag = true;
@@ -52,11 +51,11 @@ public class BookService {
         emailService.sendMail(new String[]{employees}, "contact@your-library.com", title, body);
     }
 
-    private void placeOnHold(int bookId, int patronId, int days, Book book, Patron patron) {
-        patron.getHolds().add(bookId);
+    private void placeOnHold(int days, Book book, Patron patron) {
+        patron.getHolds().add(book.getBookIdValue());
         book.setReservationDate(Instant.now());
         book.setReservationEndDate(Instant.now().plus(days, DAYS));
-        book.setPatronId(patronId);
+        book.setPatronId(patron.getPatronIdValue());
     }
 
     private boolean isAvailable(Book book) {
