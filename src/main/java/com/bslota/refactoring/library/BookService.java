@@ -52,7 +52,7 @@ public class BookService {
     }
 
     private void placeOnHold(int days, Book book, Patron patron) {
-        patron.getHolds().add(book.getBookIdValue());
+        patron.placeOnHold(book);
         book.setReservationDate(Instant.now());
         book.setReservationEndDate(Instant.now().plus(days, DAYS));
         book.setPatronId(patron.getPatronIdValue());
