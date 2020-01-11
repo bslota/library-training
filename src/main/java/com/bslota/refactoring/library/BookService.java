@@ -10,14 +10,15 @@ import static java.time.temporal.ChronoUnit.DAYS;
 @Service
 public class BookService {
 
-    @Autowired
-    private BookDAO bookDAO;
+    private final BookDAO bookDAO;
+    private final PatronDAO patronDAO;
+    private final NotificationSender emailService;
 
-    @Autowired
-    private PatronDAO patronDAO;
-
-    @Autowired
-    private NotificationSender emailService;
+    BookService(BookDAO bookDAO, PatronDAO patronDAO, NotificationSender emailService) {
+        this.bookDAO = bookDAO;
+        this.patronDAO = patronDAO;
+        this.emailService = emailService;
+    }
 
     boolean placeOnHold(int bookId, int patronId, int days) {
         Book book = bookDAO.getBookFromDatabase(bookId);
