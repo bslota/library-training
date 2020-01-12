@@ -36,12 +36,8 @@ public class BookService {
     }
 
     private void sendNotificationToEmployeesAboutFreeBookRewardFor(PatronLoyalties patronLoyalties) {
-        String title = "[REWARD] Patron for free book reward waiting";
-        String body = "Dear Colleague, \n" +
-                "One of our patrons with ID " + patronLoyalties.getPatronId() + " gathered " + patronLoyalties.getPoints() + ". \n" +
-                "Please contact him and prepare a free book reward!";
-        String employees = "customerservice@your-library.com";
-        emailService.sendMail(new String[]{employees}, "contact@your-library.com", title, body);
+        MailUtils.MailDetails details = MailUtils.freeBookRewardNotificationFor(patronLoyalties);
+        emailService.sendMail(details.recipients(), "contact@your-library.com", details.title(), details.body());
     }
 
     private boolean thereIsA(Patron patron) {
