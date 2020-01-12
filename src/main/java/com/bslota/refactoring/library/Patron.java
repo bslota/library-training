@@ -3,18 +3,14 @@ package com.bslota.refactoring.library;
 import java.util.List;
 
 public class Patron {
-    public static final int MAXIMUM_NUMBER_OF_HOLDS = 5;
+    private static final int MAXIMUM_NUMBER_OF_HOLDS = 5;
     private PatronId patronId;
-    private int type;
-    private int points;
-    private boolean qualifiesForFreeBook;
     private List<Integer> holds;
+    private final PatronLoyalties patronLoyalties;
 
-    public Patron(PatronId patronId, int type, int points, boolean qualifiesForFreeBook, List<Integer> holds) {
+    public Patron(PatronId patronId, List<Integer> holds, PatronLoyalties patronLoyalties) {
         this.patronId = patronId;
-        this.type = type;
-        this.points = points;
-        this.qualifiesForFreeBook = qualifiesForFreeBook;
+        this.patronLoyalties = patronLoyalties;
         this.holds = holds;
     }
 
@@ -31,30 +27,6 @@ public class Patron {
         return patronId.asInt();
     }
 
-    public int getType() {
-        return this.type;
-    }
-
-    public void setType(int type) {
-        this.type = type;
-    }
-
-    public int getPoints() {
-        return this.points;
-    }
-
-    public void setPoints(int points) {
-        this.points = points;
-    }
-
-    public void setQualifiesForFreeBook(boolean flag) {
-        this.qualifiesForFreeBook = flag;
-    }
-
-    public boolean isQualifiesForFreeBook() {
-        return this.qualifiesForFreeBook;
-    }
-
     public List<Integer> getHolds() {
         return this.holds;
     }
@@ -69,5 +41,9 @@ public class Patron {
 
     private boolean hasNotReachedMaximumNumberOfHolds() {
         return this.holds.size() < MAXIMUM_NUMBER_OF_HOLDS;
+    }
+
+    public PatronLoyalties getPatronLoyalties() {
+        return patronLoyalties;
     }
 }

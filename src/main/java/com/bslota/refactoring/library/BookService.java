@@ -23,24 +23,22 @@ public class BookService {
             PlaceOnHoldResult result = patron.placeOnHold(book);
             if (result instanceof BookPlacedOnHold) {
                 book.placedOnHold(patron.getPatronId(), days);
+                addLoyaltyPoints(patron.getPatronLoyalties());
+                if (patron.getPatronLoyalties().isQualifiesForFreeBook()) {
+                    sendNotificationToEmployeesAboutFreeBookRewardFor(patron.getPatronLoyalties());
+                }
                 bookDAO.update(book);
                 patronDAO.update(patron);
                 flag = true;
             }
         }
-        if (flag) {
-            addLoyaltyPoints(patron);
-        }
-        if (flag && patron.isQualifiesForFreeBook()) {
-            sendNotificationToEmployeesAboutFreeBookRewardFor(patron);
-        }
         return flag;
     }
 
-    private void sendNotificationToEmployeesAboutFreeBookRewardFor(Patron patron) {
+    private void sendNotificationToEmployeesAboutFreeBookRewardFor(PatronLoyalties patronLoyalties) {
         String title = "[REWARD] Patron for free book reward waiting";
         String body = "Dear Colleague, \n" +
-                "One of our patrons with ID " + patron.getPatronId() + " gathered " + patron.getPoints() + ". \n" +
+                "One of our patrons with ID " + patronLoyalties.getPatronId() + " gathered " + patronLoyalties.getPoints() + ". \n" +
                 "Please contact him and prepare a free book reward!";
         String employees = "customerservice@your-library.com";
         emailService.sendMail(new String[]{employees}, "contact@your-library.com", title, body);
@@ -54,31 +52,30 @@ public class BookService {
         return book != null;
     }
 
-    private void addLoyaltyPoints(Patron patron) {
-        int type = patron.getType();
+    private void addLoyaltyPoints(PatronLoyalties patronLoyalties) {
+        int type = patronLoyalties.getType();
         switch (type) {
             case 0: // regular patron
-                patron.setPoints(patron.getPoints() + 1);
+                patronLoyalties.setPoints(patronLoyalties.getPoints() + 1);
                 break;
             case 1: // researcher
-                patron.setPoints(patron.getPoints() + 5);
+                patronLoyalties.setPoints(patronLoyalties.getPoints() + 5);
                 break;
             case 2: //premium
                 int newPoints;
-                if (patron.getPoints() == 0) {
+                if (patronLoyalties.getPoints() == 0) {
                     newPoints = 100;
                 } else {
-                    newPoints = patron.getPoints() * 2;
+                    newPoints = patronLoyalties.getPoints() * 2;
                 }
-                patron.setPoints(newPoints);
+                patronLoyalties.setPoints(newPoints);
                 break;
             default:
                 break;
         }
-        if (patron.getPoints() > 10000) {
-            patron.setQualifiesForFreeBook(true);
+        if (patronLoyalties.getPoints() > 10000) {
+            patronLoyalties.setQualifiesForFreeBook(true);
         }
-        patronDAO.update(patron);
     }
 
 }

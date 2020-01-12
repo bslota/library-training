@@ -62,7 +62,7 @@ class PatronFixture {
         }
 
         Patron build() {
-            return new Patron(patronId, type, points, qualifiesForFreeBook, holds);
+            return new Patron(patronId, holds, new PatronLoyalties(patronId, type, points, qualifiesForFreeBook));
         }
 
         PatronBuilder withId(PatronId patronId) {
