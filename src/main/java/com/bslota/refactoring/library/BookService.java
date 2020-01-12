@@ -25,7 +25,7 @@ public class BookService {
             PlaceOnHoldResult result = patron.placeOnHold(book);
             if (result instanceof BookPlacedOnHold) {
                 book.placedOnHold(patron.getPatronId(), days);
-                addLoyaltyPoints(patron.getPatronLoyalties());
+                patron.getPatronLoyalties().addLoyaltyPoints();
                 if (patron.getPatronLoyalties().isQualifiesForFreeBook()) {
                     sendNotificationToEmployeesAboutFreeBookRewardFor(patron.getPatronLoyalties());
                 }
@@ -48,32 +48,6 @@ public class BookService {
 
     private boolean thereIsA(Book book) {
         return book != null;
-    }
-
-    private void addLoyaltyPoints(PatronLoyalties patronLoyalties) {
-        int type = patronLoyalties.getType();
-        switch (type) {
-            case 0: // regular patron
-                patronLoyalties.setPoints(patronLoyalties.getPoints() + 1);
-                break;
-            case 1: // researcher
-                patronLoyalties.setPoints(patronLoyalties.getPoints() + 5);
-                break;
-            case 2: //premium
-                int newPoints;
-                if (patronLoyalties.getPoints() == 0) {
-                    newPoints = 100;
-                } else {
-                    newPoints = patronLoyalties.getPoints() * 2;
-                }
-                patronLoyalties.setPoints(newPoints);
-                break;
-            default:
-                break;
-        }
-        if (patronLoyalties.getPoints() > 10000) {
-            patronLoyalties.setQualifiesForFreeBook(true);
-        }
     }
 
 }
