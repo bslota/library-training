@@ -25,8 +25,8 @@ public class BookService {
         boolean flag = false;
         if (thereIsA(book) && thereIsA(patron)) {
             if (maximumNumberOfHoldsNotReachedBy(patron)) {
-                if (isAvailable(book)) {
-                    placeOnHold(days, book, patron);
+                if (book.isAvailable()) {
+                    placeOnHold(book, patron, days);
                     bookDAO.update(book);
                     patronDAO.update(patron);
                     flag = true;
@@ -51,15 +51,9 @@ public class BookService {
         emailService.sendMail(new String[]{employees}, "contact@your-library.com", title, body);
     }
 
-    private void placeOnHold(int days, Book book, Patron patron) {
+    private void placeOnHold(Book book, Patron patron, int days) {
         patron.placeOnHold(book);
-        book.setReservationDate(Instant.now());
-        book.setReservationEndDate(Instant.now().plus(days, DAYS));
-        book.setPatronId(patron.getPatronIdValue());
-    }
-
-    private boolean isAvailable(Book book) {
-        return book.getReservationDate() == null;
+        book.placedOnHold(patron.getPatronId(), days);
     }
 
     private boolean maximumNumberOfHoldsNotReachedBy(Patron patron) {
