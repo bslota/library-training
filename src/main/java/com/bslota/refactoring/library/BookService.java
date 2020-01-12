@@ -36,7 +36,7 @@ public class BookService {
     }
 
     private void sendNotificationToEmployeesAboutFreeBookRewardFor(PatronLoyalties patronLoyalties) {
-        MailUtils.MailDetails details = MailUtils.freeBookRewardNotificationFor(patronLoyalties);
+        MailDetails details = MailUtils.freeBookRewardNotificationFor(patronLoyalties);
         emailService.sendMail(details.recipients(), "contact@your-library.com", details.title(), details.body());
     }
 
