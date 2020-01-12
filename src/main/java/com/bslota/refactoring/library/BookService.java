@@ -2,10 +2,6 @@ package com.bslota.refactoring.library;
 
 import org.springframework.stereotype.Service;
 
-import java.time.Instant;
-
-import static java.time.temporal.ChronoUnit.DAYS;
-
 @Service
 public class BookService {
 
@@ -24,14 +20,12 @@ public class BookService {
         Patron patron = patronDAO.getPatronFromDatabase(patronId);
         boolean flag = false;
         if (thereIsA(book) && thereIsA(patron)) {
-            if (book.isAvailable()) {
-                PlaceOnHoldResult result = patron.placeOnHold(book);
-                if (result instanceof BookPlacedOnHold) {
-                    book.placedOnHold(patron.getPatronId(), days);
-                    bookDAO.update(book);
-                    patronDAO.update(patron);
-                    flag = true;
-                }
+            PlaceOnHoldResult result = patron.placeOnHold(book);
+            if (result instanceof BookPlacedOnHold) {
+                book.placedOnHold(patron.getPatronId(), days);
+                bookDAO.update(book);
+                patronDAO.update(patron);
+                flag = true;
             }
         }
         if (flag) {
