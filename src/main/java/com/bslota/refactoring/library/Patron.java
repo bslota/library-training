@@ -3,6 +3,7 @@ package com.bslota.refactoring.library;
 import java.util.List;
 
 public class Patron {
+    public static final int MAXIMUM_NUMBER_OF_HOLDS = 5;
     private PatronId patronId;
     private int type;
     private int points;
@@ -17,8 +18,13 @@ public class Patron {
         this.holds = holds;
     }
 
-    void placeOnHold(Book book) {
-        this.holds.add(book.getBookIdValue());
+    PlaceOnHoldResult placeOnHold(Book book) {
+        if (hasNotReachedMaximumNumberOfHolds()) {
+            this.holds.add(book.getBookIdValue());
+            return BookPlacedOnHold.of(book.getBookId(), this.patronId);
+        } else {
+            return PlacingOnHoldFailed.of(book.getBookId(), this.patronId);
+        }
     }
 
     public int getPatronIdValue() {
@@ -59,5 +65,9 @@ public class Patron {
 
     public PatronId getPatronId() {
         return this.patronId;
+    }
+
+    private boolean hasNotReachedMaximumNumberOfHolds() {
+        return this.holds.size() < MAXIMUM_NUMBER_OF_HOLDS;
     }
 }
