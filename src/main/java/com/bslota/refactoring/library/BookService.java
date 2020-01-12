@@ -8,10 +8,12 @@ public class BookService {
     private final BookDAO bookDAO;
     private final PatronDAO patronDAO;
     private final NotificationSender emailService;
+    private final MailDetailsFactory mailDetailsFactory;
 
-    BookService(BookDAO bookDAO, PatronDAO patronDAO, NotificationSender emailService) {
+    BookService(BookDAO bookDAO, PatronDAO patronDAO, NotificationSender emailService, MailDetailsFactory mailDetailsFactory) {
         this.bookDAO = bookDAO;
         this.patronDAO = patronDAO;
+        this.mailDetailsFactory = mailDetailsFactory;
         this.emailService = emailService;
     }
 
@@ -36,7 +38,7 @@ public class BookService {
     }
 
     private void sendNotificationToEmployeesAboutFreeBookRewardFor(PatronLoyalties patronLoyalties) {
-        MailDetails details = MailUtils.freeBookRewardNotificationFor(patronLoyalties);
+        MailDetails details = mailDetailsFactory.getFreeBookRewardNotificationFor(patronLoyalties);
         emailService.sendMail(details.recipients(), "contact@your-library.com", details.title(), details.body());
     }
 

@@ -24,7 +24,7 @@ class BookServiceTest {
     private PatronDAO patronDAO = mock(PatronDAO.class);
     private NotificationSender notificationSender = mock(NotificationSender.class);
 
-    private BookService bookService = new BookService(bookDAO, patronDAO, notificationSender);
+    private BookService bookService = new BookService(bookDAO, patronDAO, notificationSender, new MailDetailsFactory());
 
     @Test
     void shouldFailToPlaceNotExistingBookOnHold() {
