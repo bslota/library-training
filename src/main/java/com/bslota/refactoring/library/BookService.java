@@ -2,6 +2,8 @@ package com.bslota.refactoring.library;
 
 import org.springframework.stereotype.Service;
 
+import java.util.Optional;
+
 @Service
 public class BookService {
 
@@ -9,12 +11,14 @@ public class BookService {
     private final PatronDAO patronDAO;
     private final NotificationSender emailService;
     private final MailDetailsFactory mailDetailsFactory;
+    private final PatronLoyaltiesDAO patronLoyaltiesDAO;
 
-    BookService(BookDAO bookDAO, PatronDAO patronDAO, NotificationSender emailService, MailDetailsFactory mailDetailsFactory) {
+    BookService(BookDAO bookDAO, PatronDAO patronDAO, NotificationSender emailService, MailDetailsFactory mailDetailsFactory, PatronLoyaltiesDAO patronLoyaltiesDAO) {
         this.bookDAO = bookDAO;
         this.patronDAO = patronDAO;
         this.mailDetailsFactory = mailDetailsFactory;
         this.emailService = emailService;
+        this.patronLoyaltiesDAO = patronLoyaltiesDAO;
     }
 
     boolean placeOnHold(int bookId, int patronId, int days) {
@@ -25,16 +29,23 @@ public class BookService {
             PlaceOnHoldResult result = patron.placeOnHold(book);
             if (result instanceof BookPlacedOnHold) {
                 book.placedOnHold(patron.getPatronId(), days);
-                patron.getPatronLoyalties().addLoyaltyPoints();
-                if (patron.getPatronLoyalties().isQualifiesForFreeBook()) {
-                    sendNotificationToEmployeesAboutFreeBookRewardFor(patron.getPatronLoyalties());
+                PatronLoyalties patronLoyalties = getPatronLoyalties(patron.getPatronId());
+                patronLoyalties.addLoyaltyPoints();
+                if (patronLoyalties.isQualifiesForFreeBook()) {
+                    sendNotificationToEmployeesAboutFreeBookRewardFor(patronLoyalties);
                 }
                 bookDAO.update(book);
                 patronDAO.update(patron);
+                patronLoyaltiesDAO.update(patronLoyalties);
                 flag = true;
             }
         }
         return flag;
+    }
+
+    private PatronLoyalties getPatronLoyalties(PatronId patronId) {
+        return Optional.ofNullable(patronLoyaltiesDAO.getLoyaltiesFromDatabase(patronId))
+                .orElse(PatronLoyalties.emptyFor(patronId));
     }
 
     private void sendNotificationToEmployeesAboutFreeBookRewardFor(PatronLoyalties patronLoyalties) {

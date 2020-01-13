@@ -24,50 +24,27 @@ class PatronFixture {
                 .build();
     }
 
-    static Patron patronQualifyingForFreeBook() {
-        return newPatron()
-                .withPoints(10000)
-                .build();
-    }
-
     static class PatronBuilder {
         private PatronId patronId = SOME_PATRON_ID;
-        private int type;
-        private int points;
-        private boolean qualifiesForFreeBook;
         private List<Integer> holds = new LinkedList<>();
 
         static PatronBuilder newPatron() {
             return new PatronBuilder();
         }
 
-        PatronBuilder withType(int type) {
-            this.type = type;
-            return this;
-        }
-
-        PatronBuilder withPoints(int points) {
-            this.points = points;
-            return this;
-        }
-
-        PatronBuilder withQualifiesForFreeBook(boolean qualifiesForFreeBook) {
-            this.qualifiesForFreeBook = qualifiesForFreeBook;
-            return this;
-        }
 
         PatronBuilder withHolds(List<Integer> holds) {
             this.holds = holds;
             return this;
         }
 
-        Patron build() {
-            return new Patron(patronId, holds, new PatronLoyalties(patronId, type, points, qualifiesForFreeBook));
-        }
-
         PatronBuilder withId(PatronId patronId) {
             this.patronId = patronId;
             return this;
+        }
+
+        Patron build() {
+            return new Patron(patronId, holds);
         }
     }
 }

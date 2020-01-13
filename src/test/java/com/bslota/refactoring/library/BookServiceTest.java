@@ -22,9 +22,10 @@ class BookServiceTest {
 
     private BookDAO bookDAO = mock(BookDAO.class);
     private PatronDAO patronDAO = mock(PatronDAO.class);
+    private PatronLoyaltiesDAO patronLoyaltiesDAO = mock(PatronLoyaltiesDAO.class);
     private NotificationSender notificationSender = mock(NotificationSender.class);
 
-    private BookService bookService = new BookService(bookDAO, patronDAO, notificationSender, new MailDetailsFactory());
+    private BookService bookService = new BookService(bookDAO, patronDAO, notificationSender, new MailDetailsFactory(), patronLoyaltiesDAO);
 
     @Test
     void shouldFailToPlaceNotExistingBookOnHold() {
@@ -120,8 +121,10 @@ class BookServiceTest {
     }
 
     private Patron patronQualifyingForFreeBook() {
-        Patron patron = PatronFixture.patronQualifyingForFreeBook();
+        Patron patron = PatronFixture.patronWithoutHolds();
+        PatronLoyalties patronLoyalties = PatronLoyaltiesFixture.patronQualifyingForFreeBook();
         when(patronDAO.getPatronFromDatabase(patron.getPatronIdValue())).thenReturn(patron);
+        when(patronLoyaltiesDAO.getLoyaltiesFromDatabase(patron.getPatronId())).thenReturn(patronLoyalties);
         return patron;
     }
 
