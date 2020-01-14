@@ -7,23 +7,23 @@ import java.util.Optional;
 @Service
 public class BookService {
 
-    private final BookDAO bookDAO;
-    private final PatronDAO patronDAO;
+    private final BookRepository bookRepository;
+    private final PatronRepository patronRepository;
     private final NotificationSender emailService;
     private final MailDetailsFactory mailDetailsFactory;
-    private final PatronLoyaltiesDAO patronLoyaltiesDAO;
+    private final PatronLoyaltiesRepository patronLoyaltiesRepository;
 
-    BookService(BookDAO bookDAO, PatronDAO patronDAO, NotificationSender emailService, MailDetailsFactory mailDetailsFactory, PatronLoyaltiesDAO patronLoyaltiesDAO) {
-        this.bookDAO = bookDAO;
-        this.patronDAO = patronDAO;
+    BookService(BookRepository bookRepository, PatronRepository patronRepository, NotificationSender emailService, MailDetailsFactory mailDetailsFactory, PatronLoyaltiesRepository patronLoyaltiesRepository) {
+        this.bookRepository = bookRepository;
+        this.patronRepository = patronRepository;
         this.mailDetailsFactory = mailDetailsFactory;
         this.emailService = emailService;
-        this.patronLoyaltiesDAO = patronLoyaltiesDAO;
+        this.patronLoyaltiesRepository = patronLoyaltiesRepository;
     }
 
     boolean placeOnHold(int bookId, int patronId, int days) {
-        Book book = bookDAO.getBookFromDatabase(bookId);
-        Patron patron = patronDAO.getPatronFromDatabase(patronId);
+        Book book = bookRepository.findBy(BookId.of(bookId));
+        Patron patron = patronRepository.findBy(PatronId.of(patronId));
         boolean flag = false;
         if (thereIsA(book) && thereIsA(patron)) {
             PlaceOnHoldResult result = patron.placeOnHold(book);
@@ -34,9 +34,9 @@ public class BookService {
                 if (patronLoyalties.isQualifiesForFreeBook()) {
                     sendNotificationToEmployeesAboutFreeBookRewardFor(patronLoyalties);
                 }
-                bookDAO.update(book);
-                patronDAO.update(patron);
-                patronLoyaltiesDAO.update(patronLoyalties);
+                bookRepository.save(book);
+                patronRepository.save(patron);
+                patronLoyaltiesRepository.update(patronLoyalties);
                 flag = true;
             }
         }
@@ -44,7 +44,7 @@ public class BookService {
     }
 
     private PatronLoyalties getPatronLoyalties(PatronId patronId) {
-        return Optional.ofNullable(patronLoyaltiesDAO.getLoyaltiesFromDatabase(patronId))
+        return Optional.ofNullable(patronLoyaltiesRepository.getLoyaltiesFromDatabase(patronId))
                 .orElse(PatronLoyalties.emptyFor(patronId));
     }
 

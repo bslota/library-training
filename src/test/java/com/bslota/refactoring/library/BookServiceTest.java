@@ -43,7 +43,7 @@ class BookServiceTest {
 
         //then
         verify(bookDAO, never()).update(any());
-        verify(patronDAO, never()).update(any());
+        verify(patronDAO, never()).save(any());
         verify(notificationSender, never()).sendMail(any(), any(), any(), any());
     }
 
@@ -97,7 +97,7 @@ class BookServiceTest {
 
         //then
         verify(bookDAO, atLeastOnce()).update(any());
-        verify(patronDAO, atLeastOnce()).update(any());
+        verify(patronDAO, atLeastOnce()).save(any());
         verify(notificationSender, never()).sendMail(any(), any(), any(), any());
     }
 
@@ -116,21 +116,21 @@ class BookServiceTest {
 
     private Patron patronWithoutHolds() {
         Patron patron = PatronFixture.patronWithoutHolds();
-        when(patronDAO.getPatronFromDatabase(patron.getPatronIdValue())).thenReturn(patron);
+        when(patronDAO.findBy(PatronId.of(patron.getPatronIdValue()))).thenReturn(patron);
         return patron;
     }
 
     private Patron patronQualifyingForFreeBook() {
         Patron patron = PatronFixture.patronWithoutHolds();
         PatronLoyalties patronLoyalties = PatronLoyaltiesFixture.patronQualifyingForFreeBook();
-        when(patronDAO.getPatronFromDatabase(patron.getPatronIdValue())).thenReturn(patron);
+        when(patronDAO.findBy(PatronId.of(patron.getPatronIdValue()))).thenReturn(patron);
         when(patronLoyaltiesDAO.getLoyaltiesFromDatabase(patron.getPatronId())).thenReturn(patronLoyalties);
         return patron;
     }
 
     private Patron patronWithMaxNumberOfHolds() {
         Patron patron = PatronFixture.patronWithMaxNumberOfHolds();
-        when(patronDAO.getPatronFromDatabase(patron.getPatronIdValue())).thenReturn(patron);
+        when(patronDAO.findBy(PatronId.of(patron.getPatronIdValue()))).thenReturn(patron);
         return patron;
     }
 

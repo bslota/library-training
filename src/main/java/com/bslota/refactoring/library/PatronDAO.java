@@ -4,12 +4,14 @@ import com.bslota.refactoring.util.DatabaseNotChosenYetException;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public class PatronDAO {
-    public Patron getPatronFromDatabase(int patronId) {
+public class PatronDAO implements PatronRepository {
+    @Override
+    public Patron findBy(PatronId id) {
         throw new DatabaseNotChosenYetException();
     }
 
-    public void update(Patron patron) {
-        throw new DatabaseNotChosenYetException();
+    @Override
+    public void save(Patron patron) {
+        findBy(null);
     }
 }
